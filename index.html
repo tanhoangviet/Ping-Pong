@@ -26,10 +26,27 @@
 
       <section class="game-panel">
         <canvas id="game" width="1100" height="650" aria-label="3D ping pong game canvas"></canvas>
+        <div class="hud-map" aria-label="Glass mini map showing the ball and paddles">
+          <span id="mini-left"></span>
+          <span id="mini-ball"></span>
+          <span id="mini-right"></span>
+        </div>
         <div id="overlay" class="overlay">
           <h2>Ready?</h2>
-          <p>Player 1: W / S &nbsp;•&nbsp; Player 2: ↑ / ↓</p>
+          <p>Player 1: W / S &nbsp;•&nbsp; Player 2: ↑ / ↓ &nbsp;•&nbsp; Mobile: touch pads</p>
           <button id="start-button">Start Match</button>
+        </div>
+        <div class="rotate-tip" aria-live="polite">Rotate to landscape for the best arcade view</div>
+      </section>
+
+      <section class="touch-controls" aria-label="Mobile touch controls">
+        <div class="touch-pad" aria-label="Player 1 touch controls">
+          <button class="touch-button" data-control="left-up">▲ P1</button>
+          <button class="touch-button" data-control="left-down">▼ P1</button>
+        </div>
+        <div class="touch-pad" aria-label="Player 2 touch controls">
+          <button class="touch-button" data-control="right-up">▲ P2</button>
+          <button class="touch-button" data-control="right-down">▼ P2</button>
         </div>
       </section>
 

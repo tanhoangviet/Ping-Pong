@@ -4,6 +4,9 @@ const scoreLeft = document.querySelector('#score-left');
 const scoreRight = document.querySelector('#score-right');
 const overlay = document.querySelector('#overlay');
 const startButton = document.querySelector('#start-button');
+const miniBall = document.querySelector('#mini-ball');
+const miniLeft = document.querySelector('#mini-left');
+const miniRight = document.querySelector('#mini-right');
 
 const keys = new Set();
 const state = {
@@ -16,7 +19,8 @@ const state = {
   winScore: 7,
   left: { x: 82, y: 260, w: 24, h: 128, color: '#7df9ff' },
   right: { x: 994, y: 260, w: 24, h: 128, color: '#ff7ac8' },
-  ball: { x: 550, y: 325, z: 12, r: 15, vx: 6, vy: 3.2, spin: 0, trail: [] }
+  ball: { x: 550, y: 325, z: 12, r: 15, vx: 6, vy: 3.2, spin: 0, trail: [] },
+  touch: { leftUp: false, leftDown: false, rightUp: false, rightDown: false }
 };
 
 function resetBall(direction = Math.random() > 0.5 ? 1 : -1) {
@@ -56,10 +60,10 @@ function endMatch(winner) {
 }
 
 function movePaddles() {
-  if (keys.has('w')) state.left.y -= state.paddleSpeed;
-  if (keys.has('s')) state.left.y += state.paddleSpeed;
-  if (keys.has('arrowup')) state.right.y -= state.paddleSpeed;
-  if (keys.has('arrowdown')) state.right.y += state.paddleSpeed;
+  if (keys.has('w') || state.touch.leftUp) state.left.y -= state.paddleSpeed;
+  if (keys.has('s') || state.touch.leftDown) state.left.y += state.paddleSpeed;
+  if (keys.has('arrowup') || state.touch.rightUp) state.right.y -= state.paddleSpeed;
+  if (keys.has('arrowdown') || state.touch.rightDown) state.right.y += state.paddleSpeed;
   state.left.y = Math.max(70, Math.min(canvas.height - state.left.h - 70, state.left.y));
   state.right.y = Math.max(70, Math.min(canvas.height - state.right.h - 70, state.right.y));
 }
@@ -116,13 +120,61 @@ function roundedRect(x, y, w, h, r) {
   ctx.fill();
 }
 
+function drawEnvironment() {
+  const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  sky.addColorStop(0, '#10153a');
+  sky.addColorStop(0.45, '#202360');
+  sky.addColorStop(1, '#482154');
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.save();
+  ctx.globalAlpha = 0.8;
+  for (let i = 0; i < 22; i++) {
+    const x = (i * 83 + 41) % canvas.width;
+    const y = 24 + (i * 37) % 175;
+    ctx.fillStyle = i % 3 === 0 ? '#ffd166' : '#7df9ff';
+    ctx.beginPath();
+    ctx.arc(x, y, 1.7 + (i % 4), 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  ctx.fillStyle = 'rgba(8, 12, 30, 0.38)';
+  for (let i = 0; i < 14; i++) {
+    const w = 42 + (i % 4) * 16;
+    const h = 72 + (i % 5) * 22;
+    const x = i * 86 - 24;
+    roundedRect(x, 214 - h, w, h, 8);
+  }
+
+  ctx.save();
+  ctx.globalAlpha = 0.48;
+  ctx.strokeStyle = '#9cffcb';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(130, 108);
+  ctx.lineTo(970, 108);
+  ctx.lineTo(1055, 570);
+  ctx.lineTo(45, 570);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+}
+
 function drawCourt() {
+  drawEnvironment();
   const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   gradient.addColorStop(0, '#202b68');
   gradient.addColorStop(0.5, '#171b3d');
   gradient.addColorStop(1, '#46245d');
+  ctx.globalAlpha = 0.9;
   ctx.fillStyle = gradient;
-  roundedRect(0, 0, canvas.width, canvas.height, 28);
+  roundedRect(52, 86, canvas.width - 104, canvas.height - 140, 28);
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle = 'rgba(255,255,255,.08)';
+  roundedRect(82, 116, canvas.width - 164, canvas.height - 200, 24);
 
   ctx.save();
   ctx.translate(0, 40);
@@ -186,6 +238,7 @@ function drawBall() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawCourt();
+  updateMiniMap();
   drawPaddle(state.left);
   drawPaddle(state.right);
   drawBall();
@@ -199,11 +252,46 @@ function draw() {
   }
 }
 
+function updateMiniMap() {
+  const xScale = 100 / canvas.width;
+  const yScale = 100 / canvas.height;
+  miniBall.style.left = `${state.ball.x * xScale}%`;
+  miniBall.style.top = `${state.ball.y * yScale}%`;
+  miniLeft.style.top = `${(state.left.y + state.left.h / 2) * yScale}%`;
+  miniRight.style.top = `${(state.right.y + state.right.h / 2) * yScale}%`;
+}
+
+function bindTouchControls() {
+  const controls = {
+    'left-up': 'leftUp',
+    'left-down': 'leftDown',
+    'right-up': 'rightUp',
+    'right-down': 'rightDown'
+  };
+
+  document.querySelectorAll('[data-control]').forEach((button) => {
+    const control = controls[button.dataset.control];
+    const press = (event) => {
+      event.preventDefault();
+      state.touch[control] = true;
+    };
+    const release = (event) => {
+      event.preventDefault();
+      state.touch[control] = false;
+    };
+    button.addEventListener('pointerdown', press);
+    button.addEventListener('pointerup', release);
+    button.addEventListener('pointerleave', release);
+    button.addEventListener('pointercancel', release);
+  });
+}
+
 window.addEventListener('keydown', (event) => {
   keys.add(event.key.toLowerCase());
   if (event.code === 'Space' && state.running) state.paused = !state.paused;
 });
 window.addEventListener('keyup', (event) => keys.delete(event.key.toLowerCase()));
 startButton.addEventListener('click', startMatch);
+bindTouchControls();
 draw();
 tick();
