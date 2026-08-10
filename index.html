@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Friendly 3D Ping Pong</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Local 2 Player Arcade</p>
+          <h1>Friendly 3D Ping Pong</h1>
+          <p class="subtitle">A soft, sunny, nostalgic 2018 browser game with chunky paddles, neon court lights, and quick couch battles.</p>
+        </div>
+        <div class="score-card" aria-label="Score board">
+          <div><span>Player 1</span><strong id="score-left">0</strong></div>
+          <div class="divider">:</div>
+          <div><span>Player 2</span><strong id="score-right">0</strong></div>
+        </div>
+      </section>
+
+      <section class="game-panel">
+        <canvas id="game" width="1100" height="650" aria-label="3D ping pong game canvas"></canvas>
+        <div id="overlay" class="overlay">
+          <h2>Ready?</h2>
+          <p>Player 1: W / S &nbsp;•&nbsp; Player 2: ↑ / ↓</p>
+          <button id="start-button">Start Match</button>
+        </div>
+      </section>
+
+      <section class="controls">
+        <article>
+          <h3>How to Play</h3>
+          <p>First to 7 points wins. Use your paddle to bounce the ball past your friend.</p>
+        </article>
+        <article>
+          <h3>Controls</h3>
+          <p><strong>P1</strong> W/S &nbsp; <strong>P2</strong> Arrow Up/Down &nbsp; <strong>Space</strong> pause</p>
+        </article>
+        <article>
+          <h3>Vibe</h3>
+          <p>Rounded UI, glow trails, pastel colors, and playful 3D depth inspired by casual web games from 2018.</p>
+        </article>
+      </section>
+    </main>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>
