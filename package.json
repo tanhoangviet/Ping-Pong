@@ -1,0 +1,15 @@
+{
+  "name": "nostalgic-3d-ping-pong",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A friendly nostalgic 2018-style two-player 3D ping pong browser game.",
+  "scripts": {
+    "start": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "vite": "latest"
+  }
+}
